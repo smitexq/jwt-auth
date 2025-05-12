@@ -1,4 +1,4 @@
-package com.jwt_auth.jwt.security;
+package com.jwt_auth.jwt.security.jwt;
 
 import com.jwt_auth.jwt.dto.JwtAuthenticationDto;
 import io.jsonwebtoken.*;
