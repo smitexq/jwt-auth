@@ -41,7 +41,8 @@ public class JwtService {
         Claims claims = Jwts.parser()
                 .verifyWith(getSingInKey())
                 .build()
-                .parseEncryptedClaims(token)
+                .parseSignedClaims(token)
+//                .parseEncryptedClaims(token)
                 .getPayload();
         return claims.getSubject();
     }
@@ -49,10 +50,15 @@ public class JwtService {
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parser()
+//                    .verifyWith(getSingInKey())
+//                    .build()
+//                    .parseEncryptedClaims(token)
+//                    .getPayload();
                     .verifyWith(getSingInKey())
                     .build()
-                    .parseEncryptedClaims(token)
+                    .parseSignedClaims(token)
                     .getPayload();
+
             return true;
         } catch (ExpiredJwtException e) {
             logger.error("Expired", e);
@@ -71,7 +77,7 @@ public class JwtService {
 
     //Временный токен (генерируется за счет постоянного)
     private String generateJwtToken(String email) {
-        Date date = Date.from(LocalDateTime.now().plusSeconds(30).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusSeconds(60).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
                 .expiration(date)
@@ -80,7 +86,7 @@ public class JwtService {
     }
     //Генерация постоянного токена
     private String generateRefreshToken(String email) {
-        Date date = Date.from(LocalDateTime.now().plusMinutes(3).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
                 .expiration(date)
