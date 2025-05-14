@@ -3,6 +3,7 @@ package com.jwt_auth.jwt.controller;
 import com.jwt_auth.jwt.dto.JwtAuthenticationDto;
 import com.jwt_auth.jwt.dto.RefreshTokenDto;
 import com.jwt_auth.jwt.dto.UserCredentialsDto;
+import com.jwt_auth.jwt.entity.User;
 import com.jwt_auth.jwt.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class AuthController {
 
     public AuthController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping("/registration")
+    public String createUser(@RequestBody User user) {
+        return userService.addUser(user);
     }
 
     @PostMapping("/sing-in")

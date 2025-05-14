@@ -10,7 +10,6 @@ import com.jwt_auth.jwt.repository.UserRepository;
 import com.jwt_auth.jwt.security.jwt.JwtService;
 import com.jwt_auth.jwt.service.UserService;
 import jakarta.transaction.Transactional;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,25 +49,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto getUserById(String id) throws ChangeSetPersister.NotFoundException {
-        return userMapper.toDto(userRepository.findByUserId(UUID.fromString(id))
-                .orElseThrow(ChangeSetPersister.NotFoundException::new));
+    public UserDto getUserById(String id) {
+        Optional<UserDto> fromDB = userRepository.findByUserId(UUID.fromString(id)).map(user -> userMapper.toDto(user));
+        if (fromDB.isPresent()) {
+            return fromDB.get();
+        }
+        return null;
     }
 
     @Override
     @Transactional
-    public UserDto getUserByEmail(String email) throws ChangeSetPersister.NotFoundException {
-        return userMapper.toDto(userRepository.findByEmail(email)
-                .orElseThrow(ChangeSetPersister.NotFoundException::new));
+    public UserDto getUserByEmail(String email) {
+        Optional<UserDto> fromDB = userRepository.findByEmail(email).map(user -> userMapper.toDto(user));
+        if (fromDB.isPresent()) {
+            return fromDB.get();
+        }
+        return null;
     }
 
     @Override
-    public String addUser(UserDto userDto) {
-        User user = userMapper.toEntity(userDto);
+    public String addUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return "User added";
     }
+
+
+
 
     private User findByCredentials(UserCredentialsDto userCredentialsDto) throws AuthenticationException {
         Optional<User> optionalUser = userRepository.findByEmail(userCredentialsDto.getEmail());
